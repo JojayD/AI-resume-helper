@@ -6,20 +6,27 @@ function FrontPageAI() {
 	const [recievedData, setRecievedData] = useState("");
 	const handleInputState = () => {};
 	useEffect(() => {
-		console.log(recievedData);
+		if (recievedData == "") {
+			console.log("Null");
+		} else {
+			console.log("Output recieved data ", recievedData);
+		}
 	}, [recievedData]);
-
 
 	async function getRes(event) {
 		event.preventDefault();
 		try {
 			console.log("Input before sending: ", input);
-			const response = await axios.post("http://127.0.0.1:3000/ai", {message: input});
-			setRecievedData(response.data);
-			console.log("Recieved data: ", recievedData);
+			const response = await axios.post("http://127.0.0.1:3000/ai", {
+				user_message: input,
+			});
+			console.log("Recieved data: ", response);
+			console.log("GPT data: ", response.data.system_message);
+			setRecievedData(response.data.system_message);
 		} catch (error) {
 			console.error("Error catching", error);
 		}
+		setInput("");
 	}
 	return (
 		<div className='container'>
@@ -47,6 +54,9 @@ function FrontPageAI() {
 						</button>
 					</div>
 				</form>
+				<div className='w-1000 mt-8'>
+					<div className='w--full'>{recievedData}</div>
+				</div>
 			</div>
 		</div>
 	);
