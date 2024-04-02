@@ -2,8 +2,12 @@
 export default {
 	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
-		extend: {},
+		extend: {
+			colors: {
+				"iphone-recieve": "#e5e5ea",
+				"iphone-sent": "#0b93f6;",
+			},
+		},
 	},
 	plugins: [],
 };
-
