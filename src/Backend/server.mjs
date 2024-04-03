@@ -1,3 +1,4 @@
+//TODO need to give all the conversations
 //dbuser dbmaster1234
 import dotenv from "dotenv";
 import OpenAI from "openai";
@@ -132,16 +133,20 @@ app.post("/", (req, res) => {
 
 app.delete("/delete_collection", async (req, res) => {
 	try {
-		const response = res.query.deletedCollectionName;
+		const response = req.query.deletedCollectionName;
+		console.log("Delete response: ", response);
 		const database = client.db("conversations");
 		const collections = database.collection(response);
 		const drop_status = await collections.drop();
 		if (drop_status) {
-			const collection = fetchAllConversations()
-			res.json(collection);
+			const collection = fetchAllConversations();
+			collection.then((response) => {
+				res.json(response);
+			});
 		}
 	} catch (e) {
 		console.log(e);
+		res.status(500).send("An error occurred while deleting the collection");
 	}
 });
 

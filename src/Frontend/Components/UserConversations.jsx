@@ -18,14 +18,19 @@ function UserConversations() {
 		setDocument(value);
 	}
 
-	async function deleteCollectionHandler(deletedCollectionName) {
+	async function deleteCollectionHandler(val) {
+		console.log("deleteCollectionHandler clicked!");
+		console.log("Here is the value of parameter: ", val);
+		setDeleteCollectionName(val);
+		console.log(deletedCollectionName);
 		axios
 			.delete(
-				`http://127.0.0.1:3000/delete_collection?deletedCollectionName=${deletedCollectionName}`
+				`http://127.0.0.1:3000/delete_collection?deletedCollectionName=${val}`
 			)
 			.then((response) => {
 				console.log("Collection successfully deleted");
 				setUserConversations(response.data);
+				window.location.reload(); // Refresh the page
 			});
 	}
 
@@ -53,14 +58,22 @@ function UserConversations() {
 	const renderConversations = () => {
 		return userConversations.map((value, index) => (
 			<div
-				className='bg-iphone-recieve flex justify-between items-center'
+				className='bg-iphone-recieve flex justify-between items-center hover:bg-customColor'
 				key={index}
 			>
-				<div className='flex'>
-					<MenuItem onClick={() => conversationLinkHandler(value)}>{value}</MenuItem>
+				<div className='flex '>
+					<MenuItem
+						className='hover:bg-white'
+						onClick={() => conversationLinkHandler(value)}
+					>
+						{value}
+					</MenuItem>
 				</div>
 
-				<div className='flex' onClick={()=> deleteCollectionHandler(value)}>
+				<div
+					className='flex'
+					onClick={() => deleteCollectionHandler(value)}
+				>
 					<FontAwesomeIcon icon={faTrashCan} />
 				</div>
 			</div>

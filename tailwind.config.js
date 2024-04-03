@@ -6,6 +6,7 @@ export default {
 			colors: {
 				"iphone-recieve": "#e5e5ea",
 				"iphone-sent": "#0b93f6;",
+				customColor: "#F3F3F3",
 			},
 		},
 	},
