@@ -1,4 +1,7 @@
 //http://127.0.0.1:3000/hello
+//TODO make user based conversations 
+//To do that we may need to get jwt token or userId
+import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ChatMessage from "./ChatMessage";
@@ -13,7 +16,7 @@ function ChatBotInput() {
 	const [activeConversation, setActiveConversation] = useState([]);
 	const [isLoadingBot, setIsLoadingBot] = useState(false);
 	const { document, setDocument } = useDocument();
-
+	const navigate = useNavigate();
 	useEffect(() => {
 		if (document) {
 			getDataBase(document);
@@ -106,8 +109,26 @@ function ChatBotInput() {
 		}
 	}
 
+	async function logoutHandler() {
+		try {
+			await axios.get("http://127.0.0.1:3000/logout", { withCredentials: true });
+			navigate("/");
+			console.log("Logged out successfully");
+		} catch (error) {
+			console.error("Failed to logout", error);
+		}
+	}
+
 	return (
 		<div className='container'>
+			<div className='flex justify-end'>
+				<button
+					onClick={() => logoutHandler()}
+					className='py-2 px-3 bg-cyan-500 text-white text-sm font-semibold rounded-md shadow-lg shadow-cyan-500/50 focus:outline-none '
+				>
+					Logout
+				</button>
+			</div>
 			<div className='container__input'>
 				<form className='flex flex-col justify-center content-center'>
 					<label>Enhance Your Resume</label>

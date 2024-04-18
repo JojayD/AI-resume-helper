@@ -1,12 +1,17 @@
-//TODO need to give all the conversations
+//BUG cannot find findOne need to find a way to search through databases
 //dbuser dbmaster1234
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import { createSecretToken } from "./createSecretToken.mjs";
 import OpenAI from "openai";
 import express from "express";
 import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 //OPEN AI CALLS
 
@@ -14,10 +19,35 @@ dotenv.config();
 const PORT = 3000;
 const PORT2 = 3001;
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+	origin: "http://localhost:5173", // Match the request origin, or use a function to dynamically set it
+	credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
+
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(process.env.URI, {
+	serverApi: {
+		version: ServerApiVersion.v1,
+		strict: true,
+		deprecationErrors: true,
+	},
+});
+
+mongoose
+	.connect(process.env.URI, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then(() => console.log("MongoDB connected"))
+	.catch((err) => console.log(err));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 dotenv.config();
@@ -26,26 +56,88 @@ wss.on("connection", function connection(ws) {
 	console.log("A client connected");
 
 	// You can also listen for messages from clients if needed
-	ws.on("message", function incoming(message) {
+	wss.on("message", function incoming(message) {
 		console.log("received: %s", message);
 	});
 });
 
-const uri =
-	"mongodb+srv://dbUser:dbmaster1234@cluster0.a8oc8fr.mongodb.net/?retryWrites=true&w=majority";
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-	serverApi: {
-		version: ServerApiVersion.v1,
-		strict: true,
-		deprecationErrors: true,
-	},
+/**
+ *MONGOOSE FOR USER AND PASSWORD
+ */
+// This should be stored securely and should be unique to your application.
+
+const UserSchema = new mongoose.Schema({
+	username: { type: String, required: true, unique: true },
+	password: { type: String, required: true },
+});
+
+UserSchema.pre("save", async function (next) {
+	if (!this.isModified("password")) {
+		return next();
+	}
+	this.password = await bcrypt.hash(this.password, 12);
+	next();
+});
+
+const User = mongoose.model("User", UserSchema);
+
+/**
+	post to get register user
+*/
+
+app.post("/register", async (req, res) => {
+	try {
+		console.log(req.body);
+		const { username, password } = req.body;
+		const existingUser = await User.findOne({ username });
+		console.log(existingUser);
+		if (existingUser) {
+			return res.json({ message: "User already exists" });
+		} else {
+			const user = new User({ username, password });
+			const savedUser = await user.save();
+			console.log("user saved", savedUser);
+			const token = createSecretToken(user);
+			res.cookie("token", token, {
+				withCredentials: true,
+				httpOnly: true,
+			});
+			res
+				.status(201)
+				.json({ message: "User successfully registered", success: true, user });
+		}
+	} catch (error) {
+		res.status(500).json("Error registering user");
+	}
+});
+
+app.post("/login", async (req, res) => {
+	try {
+		const { username, password } = req.body;
+		const user = await User.findOne({ username });
+		if (!user) {
+			return res.status(400).send("User not found");
+		}
+		const isMatch = await bcrypt.compare(password, user.password);
+		if (!isMatch) {
+			return res.status(400).send("Invalid credentials");
+		}
+
+		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+			expiresIn: "1h",
+		});
+		res.status(200).json({ token });
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 /**
+ * MONGODB
+ */
 
-FOR ChatMessage.jsx
-
+/**	
+				FOR ChatMessage.jsx
 */
 
 app.post("/ai", (req, res) => {
@@ -258,6 +350,10 @@ app.get("/get_conversations", (req, res) => {
 	}
 });
 
+app.get("/", (req, res) => {
+	res.json({ message: "Welcome to the API" });
+});
+
 /**
  * @return array of converations
  */
@@ -269,24 +365,12 @@ async function fetchAllConversations() {
 	const collections = await database.listCollections().toArray();
 	const collectionNames = collections.map((coll) => coll.name); // Extract the names of the collections
 
-	// // Map over the collection names to fetch documents from each collection
-	// const conversationPromises = collectionNames.map(async (collName) => {
-	// 	const collection = database.collection(collName);
-	// 	const elements = await collection.find().toArray(); // Use toArray to get all documents in the collection
-	// 	// Assuming you want to collect all documents into 'names'
-	// 	elements.forEach((element) => names.push(element));
-	// });
-
-	// Wait for all the document fetching operations to complete
-	// await Promise.all(conversationPromises);
-
 	console.log(names); // 'names' now contains all documents from all collections
 	return collectionNames;
 }
 
 async function run() {
 	try {
-		// Connect the client to the server	(optional starting in v4.7)
 		await client.connect();
 		// Send a ping to confirm a successful connection
 		await client.db("admin").command({ ping: 1 });
@@ -294,7 +378,6 @@ async function run() {
 		await simulateAsyncPause();
 	} catch (error) {
 		console.log(`Error: ${error}`);
-	} finally {
 	}
 }
 
@@ -303,6 +386,5 @@ server.listen(PORT2, () => {
 	watchCollection().catch(console.error);
 });
 
-watchCollection();
-
 run().catch(console.dir);
+watchCollection();

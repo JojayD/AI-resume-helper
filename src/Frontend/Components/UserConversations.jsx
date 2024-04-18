@@ -1,6 +1,4 @@
-//Where we left off: Now trying to call useEffect on DB/
-//TODO: add delte function
-//TODO: make user conversation bar take up all space on the left
+
 import React, { useEffect, useState } from "react";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
