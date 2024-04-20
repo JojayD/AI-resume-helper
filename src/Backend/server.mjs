@@ -1,9 +1,14 @@
-//BUG cannot find findOne need to find a way to search through databases
+//TODO I am currently redesigning the delete function all the function needs to now be
+//have a database since its based on the users
 //dbuser dbmaster1234
+//jo23 1234
+import { inspect } from "util";
+
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { createSecretToken } from "./createSecretToken.mjs";
+import { decodeToken } from "./decodeSecretToken.mjs";
 import OpenAI from "openai";
 import express from "express";
 import cors from "cors";
@@ -87,24 +92,37 @@ const User = mongoose.model("User", UserSchema);
 
 app.post("/register", async (req, res) => {
 	try {
-		console.log(req.body);
+		console.log("Here is the req body", req.body);
 		const { username, password } = req.body;
 		const existingUser = await User.findOne({ username });
-		console.log(existingUser);
+		console.log("Does user exsist", existingUser);
 		if (existingUser) {
 			return res.json({ message: "User already exists" });
 		} else {
 			const user = new User({ username, password });
 			const savedUser = await user.save();
 			console.log("user saved", savedUser);
-			const token = createSecretToken(user);
+			const { token, payload } = createSecretToken(user);
+			console.log("The token", token);
 			res.cookie("token", token, {
 				withCredentials: true,
 				httpOnly: true,
 			});
-			res
-				.status(201)
-				.json({ message: "User successfully registered", success: true, user });
+
+			console.log(payload);
+			const database = client.db(payload.userId);
+			const collection = database.collection("First conversation");
+			await collection.insertOne({
+				user_message: "",
+				system_message: "Welcome to the AI resume helper",
+			});
+
+			res.status(201).json({
+				message: "User successfully registered",
+				success: true,
+				user,
+				collection_name: "First conversation",
+			});
 		}
 	} catch (error) {
 		res.status(500).json("Error registering user");
@@ -123,13 +141,18 @@ app.post("/login", async (req, res) => {
 			return res.status(400).send("Invalid credentials");
 		}
 
-		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+		const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
 			expiresIn: "1h",
 		});
-		res.status(200).json({ token });
+		res.status(201).json({ token, user });
 	} catch (err) {
 		console.log(err);
 	}
+});
+
+app.get("/logout", (req, res) => {
+	res.cookie("token", "", { expires: new Date(0) });
+	res.send("Logged out");
 });
 
 /**
@@ -141,25 +164,26 @@ app.post("/login", async (req, res) => {
 */
 
 app.post("/ai", (req, res) => {
-	const resultClient = req.body.user_message;
-	const resultClientDatabase = req.body.document;
-	console.log("Result from client: ", resultClient); // Log the parsed JSON body
+	const { dataBaseName, collectionName, userMessage } = req.body;
+	console.log("Result from client: ", userMessage); // Log the parsed JSON body
 	try {
-		main(resultClient).then((gpt_res) => {
-			console.log(`\nSending to client: ${gpt_res}`);
-			res.json({ system_message: gpt_res });
-			storeDatabase(resultClient, gpt_res, resultClientDatabase).then((res) => {
-				console.log(`This is the result ${res}`);
-			});
+		main(userMessage).then((gptRes) => {
+			console.log(`\nSending to client: ${gptRes}`);
+			res.json({ system_message: gptRes });
+			storeDatabase(userMessage, gptRes, dataBaseName, collectionName).then(
+				(res) => {
+					console.log(`This is the result ${res}`);
+				}
+			);
 		});
 	} catch (error) {
-		res.send({ user_message: "Error on server side" });
+		res.send({ userMessage: "Error on server side" });
 	}
 });
 
 /**
  * get_db
- * @returns database
+ * @returns conversation of databse aka documents
  */
 app.get("/get_db", async (req, res) => {
 	if (!client) {
@@ -167,28 +191,30 @@ app.get("/get_db", async (req, res) => {
 	}
 
 	const userDatabase = req.query.databaseName;
+	const collectionName = req.query.collectionName;
 	console.log(`userDatabase get_db app recieved: ${userDatabase}`);
-	if (!userDatabase) {
-		return res
-			.status(400)
-			.send({ error: "databaseName query parameter is required" });
-	}
+	console.log(`userDatabase collectionName recieved: ${collectionName}`);
 
-	const database = client.db("conversations");
-
+	const database = client.db(userDatabase);
 	try {
-		const collArray = await fetchAllConversations(database);
-
+		// const collArray = await fetchAllConversations(database);
+		const collectionsArray = await database.listCollections().toArray();
+		const collectionNames = collectionsArray.map((coll) => {
+			console.log("Mapping through", coll.name, coll);
+			return coll.name;
+		}); // Extract the names of the collections
+		console.log(`Here is collection array \n ${collectionsArray}`);
+		console.log(`Here is collectionNames  \n ${collectionNames}`);
 		let db_res;
-		if (!collArray.includes(userDatabase)) {
+		if (!collectionNames.includes(collectionName)) {
 			console.log("Not in database, creating", userDatabase);
 			db_res = await database.createCollection(userDatabase);
 			// Initialize db_res to an empty array if the collection is new
 			db_res = [];
 		} else {
-			console.log("Found collection in database", userDatabase);
-			db_res = await retrieveDatabase(userDatabase);
+			db_res = await retrieveDatabase(userDatabase, collectionName);
 		}
+		console.log("Found collection in database", userDatabase);
 
 		const conversationArray = db_res.map((val, index) => ({
 			index: index,
@@ -199,17 +225,20 @@ app.get("/get_db", async (req, res) => {
 		console.log(conversationArray);
 		res.json(conversationArray);
 	} catch (error) {
-		console.error("Error accessing database", error);
+		console.error("Error accessing database", inspect(error, { depth: null }));
 		res.status(500).send({ error: "Internal server error" });
 	}
 });
 
 app.post("/create_collection", async (req, res) => {
-	const collection_name = req.query.collection;
-	const database = client.db("conversations");
+	const { collectionName, databaseName } = req.query;
+	console.log(
+		`Logging collectionName\n ${collectionName}\n Logging database ${databaseName}`
+	);
+	const database = client.db(databaseName);
 	try {
-		await database.createCollection(collection_name);
-		const response = fetchAllConversations();
+		await database.createCollection(collectionName);
+		const response = fetchAllConversations(databaseName);
 		response.then((response) => {
 			res.json(response);
 		});
@@ -225,10 +254,12 @@ app.post("/", (req, res) => {
 
 app.delete("/delete_collection", async (req, res) => {
 	try {
-		const response = req.query.deletedCollectionName;
-		console.log("Delete response: ", response);
-		const database = client.db("conversations");
-		const collections = database.collection(response);
+		const { deletedCollectionName, databaseName } = req.query;
+
+		// const response = req.query.deletedCollectionName;
+		console.log("Delete response: ", deletedCollectionName);
+		const database = client.db(databaseName);
+		const collections = database.collection(deletedCollectionName);
 		const drop_status = await collections.drop();
 		if (drop_status) {
 			const collection = fetchAllConversations();
@@ -275,16 +306,14 @@ async function main(input) {
 
 //TO SEND DB FOR CHANGE IN FRONTEND FOR WATCH COLLECTION
 
-async function retrieveDatabase(collectionName) {
-	const database = client.db("conversations");
-	const collections = database.collection(collectionName);
-	const docs = await collections.find({}).toArray();
-	if (docs.length > 0) {
-		console.log("Logging docs from retrieveDatabase", docs);
-		return docs;
-	} else {
-		return [];
-	}
+async function retrieveDatabase(dataBase, collectionName) {
+	const database = client.db(dataBase);
+	const collection = database.collection(collectionName);
+	const docs = await collection.find({}).toArray();
+	return docs.map((doc) => ({
+		user_message: doc.user_message,
+		system_message: doc.system_message,
+	}));
 }
 
 async function watchCollection() {
@@ -317,9 +346,14 @@ async function watchCollection() {
 	// }
 }
 
-async function storeDatabase(user_input, system_input, databaseName) {
-	const database = client.db("conversations");
-	const conversations = database.collection(databaseName);
+async function storeDatabase(
+	user_input,
+	system_input,
+	databaseName,
+	collectionName
+) {
+	const database = client.db(databaseName);
+	const conversations = database.collection(collectionName);
 
 	const doc = {
 		user_message: String(user_input),
@@ -337,10 +371,12 @@ const simulateAsyncPause = async () => {
 };
 
 app.get("/get_conversations", (req, res) => {
+	const data = req.query.database;
+	console.log("Get conversation data: ", data);
 	console.log("getconvo called");
 
 	try {
-		const response = fetchAllConversations();
+		const response = fetchAllConversations(data);
 		response.then((response) => {
 			res.json(response);
 		});
@@ -357,15 +393,15 @@ app.get("/", (req, res) => {
 /**
  * @return array of converations
  */
-async function fetchAllConversations() {
-	let names = [];
-	const database = client.db("conversations");
+async function fetchAllConversations(database) {
+	const dataBase = client.db(database);
 
 	// Use listCollections to get an array of collection information
-	const collections = await database.listCollections().toArray();
-	const collectionNames = collections.map((coll) => coll.name); // Extract the names of the collections
-
-	console.log(names); // 'names' now contains all documents from all collections
+	const collections = await dataBase.listCollections().toArray();
+	const collectionNames = collections.map((coll) => {
+		return coll.name;
+	}); // Extract the names of the collections
+	// console.log(collectionNames); // Log the actual names of the collections
 	return collectionNames;
 }
 

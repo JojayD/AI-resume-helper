@@ -8,10 +8,14 @@ function ChatBotInterface({
 	setPassword,
 	userId,
 	setUserId,
+	authenticated,
+	setAuthenticated
 }) {
 	return (
 		<>
 			<UserConversations
+				authenticated={authenticated}
+				setAuthenticated={setAuthenticated}
 				username={username}
 				password={password}
 				userId={userId}
@@ -20,6 +24,8 @@ function ChatBotInterface({
 				setUserId={setUserId}
 			/>
 			<ChatBotInput
+				authenticated={authenticated}
+				setAuthenticated={setAuthenticated}
 				username={username}
 				password={password}
 				userId={userId}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "/src/Frontend/Styles/App.css";
 import ChatBotInput from "./ChatBotInput";
 import UserConversations from "./UserConversations";
@@ -9,9 +9,13 @@ import LoginInterface from "./LoginInterface";
 import MakeUserInterface from "./MakeUserInterface";
 
 function App() {
+	const [authenticated, setAuthenticated] = useState(false);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [userId, setUserId] = useState("");
+	useEffect(() => {
+		console.log("App.jsx", userId);
+	}, [userId]);
 	return (
 		<>
 			<div className='flex gap-3 justify-center'>
@@ -20,9 +24,11 @@ function App() {
 						path='/'
 						element={
 							<LoginInterface
+								authenticated={authenticated}
+								setAuthenticated={setAuthenticated}
 								username={username}
 								password={password}
-								setUser={setUsername}
+								setUsername={setUsername}
 								setPassword={setPassword}
 								userId={userId}
 								setUserId={setUserId}
@@ -33,9 +39,11 @@ function App() {
 						path='/create'
 						element={
 							<MakeUserInterface
+								authenticated={authenticated}
+								setAuthenticated={setAuthenticated}
 								username={username}
 								password={password}
-								setUser={setUsername}
+								setUsername={setUsername}
 								setPassword={setPassword}
 								setUserId={setUserId}
 								userId={userId}
@@ -46,9 +54,11 @@ function App() {
 						path='/Chat'
 						element={
 							<ChatBotInterface
+								authenticated={authenticated}
+								setAuthenticated={setAuthenticated}
 								username={username}
 								password={password}
-								setUser={setUsername}
+								setUsername={setUsername}
 								setPassword={setPassword}
 								userId={userId}
 								setUserId={setUserId}

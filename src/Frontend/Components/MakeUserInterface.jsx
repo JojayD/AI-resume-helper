@@ -7,7 +7,9 @@ import { useNavigate } from "react-router-dom";
 // import { createSecretToken } from "/src/Backend/createSecretToken.mjs";
 function MakeUserInterface(props) {
 	const navigate = useNavigate();
-
+	useEffect(() => {
+		console.log("User id has changed", props.userId);
+	}, [props.userId]);
 	async function handleSubmit(event) {
 		event.preventDefault();
 
@@ -16,10 +18,15 @@ function MakeUserInterface(props) {
 				username: props.username,
 				password: props.password,
 			});
+			props.setUsername("");
+			props.setPassword("");
 			if (response.status === 201) {
 				const res = response.data;
-				console.log("Here is the response");
-				// navigate("/Chat");
+				console.log("Here is the response", res);
+				console.log("set res: ", res.user._id);
+				props.setUserId(res.user._id);
+				props.setAuthenticated(true);
+				navigate("/Chat");
 			} else {
 				alert("Failed to register. Please try again.");
 			}

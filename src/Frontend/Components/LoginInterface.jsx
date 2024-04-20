@@ -1,16 +1,31 @@
-
 import axios from "axios";
 import React, { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 function LoginInterface(props) {
-	const [registerUser, setRegisterUser] = useState(false);
 	const navigate = useNavigate();
-	function containsNumber(str) {
-		return /\d/.test(str);
-	}
-	async function handleSubmit() {
-		
+
+	async function handleSubmit(event) {
+		event.preventDefault();
+		try {
+			const response = await axios.post(`http://127.0.0.1:3000/login`, {
+				username: props.username,
+				password: props.password,
+			});
+
+			if (response.status === 201) {
+				const res = response.data;
+				console.log("Here is the response", res);
+				console.log("set res: ", res.user._id);
+				props.setUserId(res.user._id);
+				props.setAuthenticated(!props.authenticated);
+				navigate("/Chat");
+			} else {
+				alert("Failed to login. Please try again.");
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	return (
