@@ -3,6 +3,7 @@
 //dbuser dbmaster1234
 //jo23 1234
 import { inspect } from "util";
+import cool from "cool-ascii-faces";
 
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
@@ -17,13 +18,20 @@ import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
+// import
 //OPEN AI CALLS
 
 dotenv.config();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const PORT2 = 3001;
 const app = express();
+app
+	.use(express.static(path.join(__dirname, "public")))
+	.set("views", path.join(__dirname, "views"))
+	.set("view engine", "ejs")
+	.get("/", (req, res) => res.render("pages/index"))
+	.get("/cool", (req, res) => res.send(cool()))
+	.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const corsOptions = {
 	origin: "http://localhost:5173", // Match the request origin, or use a function to dynamically set it
@@ -47,10 +55,7 @@ const client = new MongoClient(process.env.URI, {
 });
 
 mongoose
-	.connect(process.env.URI, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	})
+	.connect(process.env.URI)
 	.then(() => console.log("MongoDB connected"))
 	.catch((err) => console.log(err));
 
