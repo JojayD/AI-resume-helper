@@ -2,9 +2,12 @@
 //have a database since its based on the users
 //dbuser dbmaster1234
 //jo23 1234
+import { fileURLToPath } from "url";
 import { inspect } from "util";
-import cool from "cool-ascii-faces";
+import { dirname } from "path";
 
+import cool from "cool-ascii-faces";
+import path from "path";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -18,10 +21,11 @@ import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-// import
 //OPEN AI CALLS
 
 dotenv.config();
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const PORT = process.env.PORT || 3000;
 const PORT2 = 3001;
 const app = express();
@@ -269,10 +273,6 @@ app.delete("/delete_collection", async (req, res) => {
 		console.log(e);
 		res.status(500).send("An error occurred while deleting the collection");
 	}
-});
-
-app.listen(PORT, (req, res) => {
-	console.log(`Listening on port ${PORT}`);
 });
 
 async function main(input) {
