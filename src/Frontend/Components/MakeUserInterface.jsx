@@ -14,10 +14,13 @@ function MakeUserInterface(props) {
 		event.preventDefault();
 
 		try {
-			const response = await axios.post("http://127.0.0.1:3000/register", {
-				username: props.username,
-				password: props.password,
-			});
+			const response = await axios.post(
+				`${process.env.REACT_APP_API_URL}/register`,
+				{
+					username: props.username,
+					password: props.password,
+				}
+			);
 			props.setUsername("");
 			props.setPassword("");
 			if (response.status === 201) {

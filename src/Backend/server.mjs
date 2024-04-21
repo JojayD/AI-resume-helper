@@ -27,7 +27,7 @@ dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const PORT = process.env.PORT || 3000;
-const PORT2 = 3001;
+const PORT2 = 3002;
 const app = express();
 app
 	.use(express.static(path.join(__dirname, "public")))
@@ -38,7 +38,7 @@ app
 	.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const corsOptions = {
-	origin: "http://localhost:5173", // Match the request origin, or use a function to dynamically set it
+	origin: "https://ai-resume-helper-m7ve01g4k-jojayds-projects.vercel.app",
 	credentials: true,
 };
 
