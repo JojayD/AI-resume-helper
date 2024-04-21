@@ -113,9 +113,7 @@ function ChatBotInput(props) {
 		const url = `http://127.0.0.1:3000/get_db?databaseName=${encodeURIComponent(
 			databaseName
 		)}&collectionName=${encodeURIComponent(collectionName)}`;
-		if (!databaseName || !collectionName) {
-			alert("Both databaseName and collectionName are required");
-		}
+
 		try {
 			const response = await axios.get(url);
 			console.log(response.data);
