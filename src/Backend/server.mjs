@@ -206,14 +206,7 @@ app.get("/get_db", async (req, res) => {
 		console.log(`Here is collection array \n ${collectionsArray}`);
 		console.log(`Here is collectionNames  \n ${collectionNames}`);
 		let db_res;
-		if (!collectionNames.includes(collectionName)) {
-			console.log("Not in database, creating", userDatabase);
-			db_res = await database.createCollection(userDatabase);
-			// Initialize db_res to an empty array if the collection is new
-			db_res = [];
-		} else {
-			db_res = await retrieveDatabase(userDatabase, collectionName);
-		}
+		db_res = await retrieveDatabase(userDatabase, collectionName);
 		console.log("Found collection in database", userDatabase);
 
 		const conversationArray = db_res.map((val, index) => ({
@@ -262,7 +255,7 @@ app.delete("/delete_collection", async (req, res) => {
 		const collections = database.collection(deletedCollectionName);
 		const drop_status = await collections.drop();
 		if (drop_status) {
-			const collection = fetchAllConversations();
+			const collection = fetchAllConversations(databaseName);
 			collection.then((response) => {
 				res.json(response);
 			});
@@ -401,7 +394,7 @@ async function fetchAllConversations(database) {
 	const collectionNames = collections.map((coll) => {
 		return coll.name;
 	}); // Extract the names of the collections
-	// console.log(collectionNames); // Log the actual names of the collections
+	console.log(collectionNames); // Log the actual names of the collections
 	return collectionNames;
 }
 
