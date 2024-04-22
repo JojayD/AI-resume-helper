@@ -35,14 +35,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app
-	.use(express.static(path.join(__dirname, "public")))
-	.set("views", path.join(__dirname, "views"))
-	.set("view engine", "ejs")
-	.get("/", (req, res) => res.render("pages/index"))
-	.get("/cool", (req, res) => res.send(cool()))
-	.listen(PORT, () => console.log(`Listening on ${PORT}`));
-
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
@@ -413,7 +406,7 @@ async function run() {
 	}
 }
 
-server.listen(PORT2, () => {
+server.listen(PORT, () => {
 	console.log(`Server running on port ${PORT2}`);
 	watchCollection().catch(console.error);
 });
