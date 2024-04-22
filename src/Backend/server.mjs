@@ -6,13 +6,11 @@ import { fileURLToPath } from "url";
 import { inspect } from "util";
 import { dirname } from "path";
 
-import cool from "cool-ascii-faces";
 import path from "path";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { createSecretToken } from "./createSecretToken.mjs";
-import { decodeToken } from "./decodeSecretToken.mjs";
 import OpenAI from "openai";
 import express from "express";
 import cors from "cors";

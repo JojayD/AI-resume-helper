@@ -1,1 +1,1 @@
-web: npm src/Backend/server.mjs
+web: node src/Backend/server.mjs
