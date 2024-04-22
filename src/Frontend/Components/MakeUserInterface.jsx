@@ -9,7 +9,9 @@ const apiUrl =
 	process.env.NODE_ENV === "development"
 		? "http://localhost:3000" // Local API for development
 		: process.env.REACT_APP_API_URL; // Production API URL from environment variables
-console.log("MakeUserInterface", apiUrl);
+console.log("Environment:", process.env.NODE_ENV);
+console.log("API URL:", process.env.REACT_APP_API_URL);
+
 function MakeUserInterface(props) {
 	const navigate = useNavigate();
 	useEffect(() => {

@@ -9,28 +9,32 @@ function LoginInterface(props) {
 			? "http://localhost:3000" // Local API for development
 			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
 
-async function handleSubmit(event) {
-	event.preventDefault();
-	try {
-		const response = await axios.post(`${apiUrl}/login`, {
-			username: props.username,
-			password: props.password,
-		});
+	console.log("Environment:", process.env.NODE_ENV);
+	console.log("API URL:", process.env.REACT_APP_API_URL);
 
-		if (response.status === 201) {
-			localStorage.setItem("token", response.data.token); // Store the token
-			props.setUserId(response.data.user._id);
-			props.setAuthenticated(true);
-			navigate("/Chat");
-		} else {
-			alert("Failed to login. Please try again.");
+	console.log("Final API URL:", apiUrl);
+
+	async function handleSubmit(event) {
+		event.preventDefault();
+		try {
+			const response = await axios.post(`${apiUrl}/login`, {
+				username: props.username,
+				password: props.password,
+			});
+
+			if (response.status === 201) {
+				localStorage.setItem("token", response.data.token); // Store the token
+				props.setUserId(response.data.user._id);
+				props.setAuthenticated(true);
+				navigate("/Chat");
+			} else {
+				alert("Failed to login. Please try again.");
+			}
+		} catch (error) {
+			console.error("Login error:", error);
+			alert("An error occurred during login.");
 		}
-	} catch (error) {
-		console.error("Login error:", error);
-		alert("An error occurred during login.");
 	}
-}
-
 
 	return (
 		<div className='min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>

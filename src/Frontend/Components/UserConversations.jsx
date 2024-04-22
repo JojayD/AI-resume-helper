@@ -6,10 +6,18 @@ import axios from "../../Backend/axiosConfig.mjs";
 import "../Styles/UserConversations.css";
 import { useDocument } from "./Context";
 function UserConversations(props) {
+	const apiUrl =
+		process.env.NODE_ENV === "development"
+			? "http://localhost:3000" // Local API for development
+			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
+	console.log("Environment:", process.env.NODE_ENV);
+	console.log("API URL:", process.env.REACT_APP_API_URL);
 	const [userConversations, setUserConversations] = useState([]);
 	const [collection, setCollection] = useState("");
 	const [deletedCollectionName, setDeleteCollectionName] = useState("");
 	const { document, setDocument } = useDocument();
+	console.log("Environment:", process.env.NODE_ENV);
+	console.log("API URL:", process.env.REACT_APP_API_URL);
 
 	function conversationLinkHandler(value) {
 		setDocument(value);
@@ -22,7 +30,7 @@ function UserConversations(props) {
 		console.log(deletedCollectionName);
 		axios
 			.delete(
-				`http://127.0.0.1:3000/delete_collection?deletedCollectionName=${encodeURIComponent(
+				`${apiUrl}/delete_collection?deletedCollectionName=${encodeURIComponent(
 					val
 				)}&
 		)}&databaseName=${props.userId}`
@@ -35,7 +43,7 @@ function UserConversations(props) {
 	}
 
 	async function createCollectionHandler(collectionName, databaseName) {
-		const url = `http://127.0.0.1:3000/create_collection?collectionName=${encodeURIComponent(
+		const url = `${apiUrl}/create_collection?collectionName=${encodeURIComponent(
 			collection
 		)}&databaseName=${props.userId}`;
 		const response = await axios.post(url);
@@ -44,7 +52,7 @@ function UserConversations(props) {
 	}
 
 	useEffect(() => {
-		axios(`http://127.0.0.1:3000/get_conversations?database=${props.userId}`)
+		axios(`${apiUrl}/get_conversations?database=${props.userId}`)
 			.then((result) => {
 				console.log(result.data);
 				setUserConversations(result.data);
