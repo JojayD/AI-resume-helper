@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../Backend/axiosConfig.mjs";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +9,7 @@ const apiUrl =
 	process.env.NODE_ENV === "development"
 		? "http://localhost:3000" // Local API for development
 		: process.env.REACT_APP_API_URL; // Production API URL from environment variables
-	console.log(apiUrl);
+console.log("MakeUserInterface", apiUrl);
 function MakeUserInterface(props) {
 	const navigate = useNavigate();
 	useEffect(() => {
@@ -29,6 +29,11 @@ function MakeUserInterface(props) {
 				const res = response.data;
 				console.log("Here is the response", res);
 				console.log("set res: ", res.user._id);
+				if (response.data.token) {
+					localStorage.setItem("token", response.data.token);
+				} else {
+					console.error("No token received");
+				}
 				props.setUserId(res.user._id);
 				props.setAuthenticated(true);
 				navigate("/Chat");
@@ -110,7 +115,7 @@ function MakeUserInterface(props) {
 						<div className='flex gap-4 justify-center items-center'>
 							<Link to={`/`}>
 								<button className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 gap-4 align-middle'>
-									<FontAwesomeIcon icon={faArrowLeft}/>
+									<FontAwesomeIcon icon={faArrowLeft} />
 								</button>
 							</Link>
 						</div>

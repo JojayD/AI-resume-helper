@@ -1,6 +1,6 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import axios from "../../Backend/axiosConfig.mjs";
 
 function LoginInterface(props) {
 	const navigate = useNavigate();
@@ -8,28 +8,29 @@ function LoginInterface(props) {
 		process.env.NODE_ENV === "development"
 			? "http://localhost:3000" // Local API for development
 			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
-	async function handleSubmit(event) {
-		event.preventDefault();
-		try {
-			const response = await axios.post(`${apiUrl}/login`, {
-				username: props.username,
-				password: props.password,
-			});
 
-			if (response.status === 201) {
-				const res = response.data;
-				console.log("Here is the response", res);
-				console.log("set res: ", res.user._id);
-				props.setUserId(res.user._id);
-				props.setAuthenticated(!props.authenticated);
-				navigate("/Chat");
-			} else {
-				alert("Failed to login. Please try again.");
-			}
-		} catch (error) {
-			console.log(error);
+async function handleSubmit(event) {
+	event.preventDefault();
+	try {
+		const response = await axios.post(`${apiUrl}/login`, {
+			username: props.username,
+			password: props.password,
+		});
+
+		if (response.status === 201) {
+			localStorage.setItem("token", response.data.token); // Store the token
+			props.setUserId(response.data.user._id);
+			props.setAuthenticated(true);
+			navigate("/Chat");
+		} else {
+			alert("Failed to login. Please try again.");
 		}
+	} catch (error) {
+		console.error("Login error:", error);
+		alert("An error occurred during login.");
 	}
+}
+
 
 	return (
 		<div className='min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>

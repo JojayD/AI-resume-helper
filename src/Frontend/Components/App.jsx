@@ -6,6 +6,8 @@ import ChatBotInterface from "./ChatBotInterface";
 import { Routes, Route } from "react-router-dom";
 import LoginInterface from "./LoginInterface";
 import MakeUserInterface from "./MakeUserInterface";
+import '../../Backend/axiosConfig.mjs';  
+
 
 function App() {
 	const [authenticated, setAuthenticated] = useState(false);

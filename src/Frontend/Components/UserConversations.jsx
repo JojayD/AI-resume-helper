@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
+import axios from "../../Backend/axiosConfig.mjs";
 import "../Styles/UserConversations.css";
 import { useDocument } from "./Context";
 function UserConversations(props) {

@@ -3,10 +3,11 @@
 //To do that we may need to get jwt token or userId
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
 import ChatMessage from "./ChatMessage";
 import { useCookies } from "react-cookie";
 import { useDocument } from "./Context";
+import axios from "../../Backend/axiosConfig.mjs";
 const apiUrl =
 	process.env.NODE_ENV === "development"
 		? "http://localhost:3000" // Local API for development
@@ -135,6 +136,7 @@ function ChatBotInput(props) {
 			});
 			console.log(response);
 			removeCookie("token");
+			localStorage.removeItem("token"); // Removing the token from storage
 			props.setAuthenticated(false);
 			navigate("/");
 			console.log("Logged out successfully");

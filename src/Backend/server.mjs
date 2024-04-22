@@ -34,6 +34,7 @@ const PORT2 = 3002;
 const corsOptions = {
 	origin: url,
 	credentials: true,
+	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 };
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -131,6 +132,7 @@ app.post("/register", async (req, res) => {
 				success: true,
 				user,
 				collection_name: "First conversation",
+				token
 			});
 		}
 	} catch (error) {
@@ -153,6 +155,7 @@ app.post("/login", async (req, res) => {
 		const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
 			expiresIn: "1h",
 		});
+		console.log("Logging token", token);
 		res.status(201).json({ token, user });
 	} catch (err) {
 		console.log(err);
