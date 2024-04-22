@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-// import { createSecretToken } from "/src/Backend/createSecretToken.mjs";
+
+
 function MakeUserInterface(props) {
 	const navigate = useNavigate();
 	useEffect(() => {

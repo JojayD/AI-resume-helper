@@ -33,7 +33,7 @@ function ChatBotInput(props) {
 	}, []);
 
 	useEffect(() => {
-		const ws = new WebSocket("ws://localhost:3001");
+		const ws = new WebSocket(process.env.REACT_APP_API_URL);
 		ws.onmessage = (event) => {
 			const message = JSON.parse(event);
 			console.log(`New Data recieved from ai\nFrom websocket\nr${message}`);
