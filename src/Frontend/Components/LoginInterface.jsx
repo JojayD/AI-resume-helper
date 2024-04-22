@@ -4,11 +4,14 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 
 function LoginInterface(props) {
 	const navigate = useNavigate();
-
+	const apiUrl =
+		process.env.NODE_ENV === "development"
+			? "http://localhost:3000" // Local API for development
+			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
 	async function handleSubmit(event) {
 		event.preventDefault();
 		try {
-			const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
+			const response = await axios.post(`${apiUrl}/login`, {
 				username: props.username,
 				password: props.password,
 			});

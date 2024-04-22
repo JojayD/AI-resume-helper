@@ -5,7 +5,6 @@
 import { fileURLToPath } from "url";
 import { inspect } from "util";
 import { dirname } from "path";
-
 import path from "path";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
@@ -20,15 +19,20 @@ import WebSocket, { WebSocketServer } from "ws";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 //OPEN AI CALLS
+dotenv.config({ path: "../../.env" });
 
-dotenv.config();
+let url =
+	process.env.NODE_ENV === "development"
+		? "https://ai-resume-helper-m7ve01g4k-jojayds-projects.vercel.app"
+		: "http://localhost:5173";
+console.log("Currently in ", url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
+console.log("MongoDB URI:", process.env.URI);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PORT2 = 3002;
 const corsOptions = {
-	origin: "https://ai-resume-helper-m7ve01g4k-jojayds-projects.vercel.app",
+	origin: url,
 	credentials: true,
 };
 app.use(cors(corsOptions));
@@ -402,7 +406,7 @@ async function run() {
 	}
 }
 
-server.listen(PORT, () => {
+server.listen(PORT2, () => {
 	console.log(`Server running on port ${PORT2}`);
 	watchCollection().catch(console.error);
 });

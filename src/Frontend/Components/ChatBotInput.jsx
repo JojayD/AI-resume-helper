@@ -7,11 +7,12 @@ import axios from "axios";
 import ChatMessage from "./ChatMessage";
 import { useCookies } from "react-cookie";
 import { useDocument } from "./Context";
+const apiUrl =
+	process.env.NODE_ENV === "development"
+		? "http://localhost:3000" // Local API for development
+		: process.env.REACT_APP_API_URL; // Production API URL from environment variables
 function ChatBotInput(props) {
-	const apiUrl =
-		process.env.NODE_ENV === "development"
-			? "http://localhost:3000" // Local API for development
-			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
+	console.log("APIURL", apiUrl);
 	const [fetchCounter, setFetchCounter] = useState(0);
 	const [loadLastIndex, setloadLastIndex] = useState(false);
 	const [cookies, setCookie, removeCookie] = useCookies(["token"]);
@@ -37,7 +38,7 @@ function ChatBotInput(props) {
 	}, []);
 
 	useEffect(() => {
-		const ws = new WebSocket(apiUrl);
+		const ws = new WebSocket("ws://localhost:3002");
 		ws.onmessage = (event) => {
 			const message = JSON.parse(event);
 			console.log(`New Data recieved from ai\nFrom websocket\nr${message}`);
