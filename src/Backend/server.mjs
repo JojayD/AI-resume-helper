@@ -27,6 +27,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PORT2 = 3002;
+const corsOptions = {
+	origin: "https://ai-resume-helper-m7ve01g4k-jojayds-projects.vercel.app",
+	credentials: true,
+};
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
@@ -39,10 +43,6 @@ app
 	.get("/cool", (req, res) => res.send(cool()))
 	.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-const corsOptions = {
-	origin: "https://ai-resume-helper-m7ve01g4k-jojayds-projects.vercel.app",
-	credentials: true,
-};
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
