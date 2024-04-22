@@ -8,6 +8,10 @@ import ChatMessage from "./ChatMessage";
 import { useCookies } from "react-cookie";
 import { useDocument } from "./Context";
 function ChatBotInput(props) {
+	const apiUrl =
+		process.env.NODE_ENV === "development"
+			? "http://localhost:3000" // Local API for development
+			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
 	const [fetchCounter, setFetchCounter] = useState(0);
 	const [loadLastIndex, setloadLastIndex] = useState(false);
 	const [cookies, setCookie, removeCookie] = useCookies(["token"]);
@@ -33,7 +37,7 @@ function ChatBotInput(props) {
 	}, []);
 
 	useEffect(() => {
-		const ws = new WebSocket(process.env.REACT_APP_API_URL);
+		const ws = new WebSocket(apiUrl);
 		ws.onmessage = (event) => {
 			const message = JSON.parse(event);
 			console.log(`New Data recieved from ai\nFrom websocket\nr${message}`);
@@ -90,7 +94,7 @@ function ChatBotInput(props) {
 		event.preventDefault();
 		try {
 			console.log("Input before sending: ", input);
-			const response = await axios.post(`${process.env.REACT_APP_API_URL}/ai`, {
+			const response = await axios.post(`${apiUrl}/ai`, {
 				userMessage: input,
 				dataBaseName: props.userId,
 				collectionName: document,
@@ -110,9 +114,7 @@ function ChatBotInput(props) {
 	//TODO make sure the database gets called as a
 	async function getDataBase(databaseName, collectionName) {
 		console.log("Called getDataBase", databaseName);
-		const url = `${
-			process.env.REACT_APP_API_URL
-		}/get_db?databaseName=${encodeURIComponent(
+		const url = `${apiUrl}/get_db?databaseName=${encodeURIComponent(
 			databaseName
 		)}&collectionName=${encodeURIComponent(collectionName)}`;
 
@@ -127,7 +129,7 @@ function ChatBotInput(props) {
 
 	async function logoutHandler() {
 		try {
-			const response = await axios.get(`${process.env.REACT_APP_API_URL}/logout`, {
+			const response = await axios.get(`${apiUrl}/logout`, {
 				withCredentials: true,
 			});
 			console.log(response);

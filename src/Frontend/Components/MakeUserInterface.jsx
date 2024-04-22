@@ -4,7 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+const apiUrl =
+	process.env.NODE_ENV === "development"
+		? "http://localhost:3000" // Local API for development
+		: process.env.REACT_APP_API_URL; // Production API URL from environment variables
 
 function MakeUserInterface(props) {
 	const navigate = useNavigate();
@@ -15,13 +18,10 @@ function MakeUserInterface(props) {
 		event.preventDefault();
 
 		try {
-			const response = await axios.post(
-				`${process.env.REACT_APP_API_URL}/register`,
-				{
-					username: props.username,
-					password: props.password,
-				}
-			);
+			const response = await axios.post(`${apiUrl}/register`, {
+				username: props.username,
+				password: props.password,
+			});
 			props.setUsername("");
 			props.setPassword("");
 			if (response.status === 201) {
@@ -109,7 +109,7 @@ function MakeUserInterface(props) {
 						<div className='flex gap-4 justify-center items-center'>
 							<Link to={`/`}>
 								<button className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 gap-4 align-middle'>
-									<FontAwesomeIcon icon={faArrowLeft} />
+									<FontAwesomeIcon icon={faArrowLeft}/>
 								</button>
 							</Link>
 						</div>

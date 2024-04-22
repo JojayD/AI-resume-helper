@@ -21,7 +21,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 //OPEN AI CALLS
 
-
 dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -35,6 +34,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
@@ -56,7 +57,6 @@ mongoose
 	.catch((err) => console.log(err));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-dotenv.config();
 
 wss.on("connection", function connection(ws) {
 	console.log("A client connected");
@@ -90,6 +90,10 @@ const User = mongoose.model("User", UserSchema);
 /**
 	post to get register user
 */
+
+app.get("/", (req, res) => {
+	res.send("Hello World!");
+});
 
 app.post("/register", async (req, res) => {
 	try {
@@ -241,8 +245,6 @@ app.post("/create_collection", async (req, res) => {
 	}
 });
 
-
-
 app.delete("/delete_collection", async (req, res) => {
 	try {
 		const { deletedCollectionName, databaseName } = req.query;
@@ -372,7 +374,6 @@ app.get("/get_conversations", (req, res) => {
 		Error;
 	}
 });
-
 
 /**
  * @return array of converations
