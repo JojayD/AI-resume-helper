@@ -21,6 +21,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 //OPEN AI CALLS
 
+
 dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -240,10 +241,7 @@ app.post("/create_collection", async (req, res) => {
 	}
 });
 
-app.post("/", (req, res) => {
-	const result = req.body;
-	console.log("Result from client: ", result); // Log the parsed JSON body
-});
+
 
 app.delete("/delete_collection", async (req, res) => {
 	try {
@@ -375,9 +373,6 @@ app.get("/get_conversations", (req, res) => {
 	}
 });
 
-app.get("/", (req, res) => {
-	res.json({ message: "Welcome to the API" });
-});
 
 /**
  * @return array of converations
