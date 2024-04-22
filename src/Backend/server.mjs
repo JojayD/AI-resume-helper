@@ -24,9 +24,13 @@ import bcrypt from "bcryptjs";
 dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const app = express();
 const PORT = process.env.PORT || 3000;
 const PORT2 = 3002;
-const app = express();
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(cookieParser());
+
 app
 	.use(express.static(path.join(__dirname, "public")))
 	.set("views", path.join(__dirname, "views"))
@@ -39,10 +43,6 @@ const corsOptions = {
 	origin: "https://ai-resume-helper-m7ve01g4k-jojayds-projects.vercel.app",
 	credentials: true,
 };
-
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(cookieParser());
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
