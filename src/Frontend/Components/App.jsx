@@ -3,7 +3,6 @@ import "/src/Frontend/Styles/App.css";
 import ChatBotInput from "./ChatBotInput";
 import UserConversations from "./UserConversations";
 import ChatBotInterface from "./ChatBotInterface";
-import axios from "axios";
 import { Routes, Route } from "react-router-dom";
 import LoginInterface from "./LoginInterface";
 import MakeUserInterface from "./MakeUserInterface";
