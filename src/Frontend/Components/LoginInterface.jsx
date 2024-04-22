@@ -9,9 +9,6 @@ function LoginInterface(props) {
 			? "http://localhost:3000" // Local API for development
 			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
 
-	console.log("Environment:", process.env.NODE_ENV);
-	console.log("API URL:", process.env.REACT_APP_API_URL);
-
 	console.log("Final API URL:", apiUrl);
 
 	async function handleSubmit(event) {
