@@ -36,7 +36,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;
 const corsOptions = {
-	origin: "https://ai-resume-helper-git-main-jojayds-projects.vercel.app",
+	origin:
+		"https://ai-resume-helper-git-deploy-branch-jojayds-projects.vercel.app",
 	credentials: true,
 	optionsSuccessStatus: 200, // For legacy browser support
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
