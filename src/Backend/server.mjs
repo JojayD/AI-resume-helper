@@ -1,6 +1,11 @@
-// Import necessary libraries
-import { fileURLToPath, URL } from "url";
-import { dirname, join } from "path";
+//TODO I am currently redesigning the delete function all the function needs to now be
+//have a database since its based on the users
+//dbuser dbmaster1234
+//jo23 1234
+import { fileURLToPath } from "url";
+import { inspect } from "util";
+import { dirname } from "path";
+import path from "path";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -9,39 +14,36 @@ import OpenAI from "openai";
 import express from "express";
 import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
+import http from "http";
+import WebSocket, { WebSocketServer } from "ws";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+//OPEN AI CALLS
+dotenv.config({ path: "../../.env" });
 
-// Load environment variables
-dotenv.config(); // Adjust if .env file is not in the root
-
-// Setup CORS and URL
 const developmentUrl = "http://localhost:5173";
 const productionUrl =
 	"https://ai-resume-helper-git-main-jojayds-projects.vercel.app";
 const url =
 	process.env.NODE_ENV === "development" ? developmentUrl : productionUrl;
+
 console.log("Currently in ", url);
 
-// Setup Express app
+console.log("MongoDB URI:", process.env.URI);
+
 const app = express();
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;
-app.use(
-	cors({
-		origin: url,
-		credentials: true,
-		optionsSuccessStatus: 200, // For legacy browser support
-		methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-	})
-);
+const corsOptions = {
+	origin: url,
+	credentials: true,
+	optionsSuccessStatus: 200, // For legacy browser support
+	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-
-// Serve static files
-const __dirname = dirname(fileURLToPath(import.meta.url));
-app.use(express.static(join(__dirname, "public")));
-
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
@@ -61,15 +63,6 @@ mongoose
 	.catch((err) => console.log(err));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-wss.on("connection", function connection(ws) {
-	console.log("A client connected");
-
-	// You can also listen for messages from clients if needed
-	wss.on("message", function incoming(message) {
-		console.log("received: %s", message);
-	});
-});
 
 /**
  *MONGOOSE FOR USER AND PASSWORD
@@ -399,19 +392,24 @@ async function fetchAllConversations(database) {
 async function run() {
 	try {
 		await client.connect();
-		// Send a ping to confirm a successful connection
-		await client.db("admin").command({ ping: 1 });
-		console.log("Pinged your deployment. You successfully connected to MongoDB!");
-		await simulateAsyncPause();
-	} catch (error) {
-		console.log(`Error: ${error}`);
+		console.log("MongoDB connected");
+
+		// Call watchCollection here after successful connection
+		await watchCollection();
+
+		server.listen(PORT, () => {
+			console.log(`Server running on port ${PORT}`);
+		});
+
+		wss.on("connection", function connection(ws) {
+			console.log("A client connected");
+			ws.on("message", function incoming(message) {
+				console.log("received: %s", message);
+			});
+		});
+	} catch (err) {
+		console.error("Failed to connect to MongoDB", err);
 	}
 }
 
-server.listen(PORT2, () => {
-	console.log(`Server running on port ${PORT2}`);
-	watchCollection().catch(console.error);
-});
-
 run().catch(console.dir);
-watchCollection();
