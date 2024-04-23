@@ -25,7 +25,7 @@ const developmentUrl = "http://localhost:5173";
 const productionUrl =
 	"https://ai-resume-helper-git-main-jojayds-projects.vercel.app";
 const url =
-	process.env.NODE_ENV === "development" ? developmentUrl : productionUrl;
+	process.env.NODE_ENV === "development" ? productionUrl : productionUrl;
 
 console.log("Currently in ", url);
 
@@ -36,7 +36,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;
 const corsOptions = {
-	origin: url,
+	origin: "https://ai-resume-helper-git-main-jojayds-projects.vercel.app",
 	credentials: true,
 	optionsSuccessStatus: 200, // For legacy browser support
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
