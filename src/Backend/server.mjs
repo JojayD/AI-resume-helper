@@ -1,11 +1,6 @@
-//TODO I am currently redesigning the delete function all the function needs to now be
-//have a database since its based on the users
-//dbuser dbmaster1234
-//jo23 1234
-import { fileURLToPath } from "url";
-import { inspect } from "util";
-import { dirname } from "path";
-import path from "path";
+// Import necessary libraries
+import { fileURLToPath, URL } from "url";
+import { dirname, join } from "path";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -14,34 +9,37 @@ import OpenAI from "openai";
 import express from "express";
 import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
-import http from "http";
-import WebSocket, { WebSocketServer } from "ws";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-//OPEN AI CALLS
-dotenv.config({ path: "../../.env" });
 
-let url =
-	process.env.NODE_ENV === "development"
-		? "ai-resume-helper-git-main-jojayds-projects.vercel.app"
-		: "http://localhost:5173";
+// Load environment variables
+dotenv.config(); // Adjust if .env file is not in the root
+
+// Setup CORS and URL
+const developmentUrl = "http://localhost:5173";
+const productionUrl =
+	"https://ai-resume-helper-git-main-jojayds-projects.vercel.app";
+const url =
+	process.env.NODE_ENV === "development" ? developmentUrl : productionUrl;
 console.log("Currently in ", url);
-const __dirname = dirname(fileURLToPath(import.meta.url));
-console.log("MongoDB URI:", process.env.URI);
+
+// Setup Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
-const PORT2 = 3002;
-const corsOptions = {
-	origin: url,
-	credentials: true,
-	optionsSuccessStatus: 200, // For legacy browser support
-	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-};
-app.use(cors(corsOptions));
+app.use(
+	cors({
+		origin: url,
+		credentials: true,
+		optionsSuccessStatus: 200, // For legacy browser support
+		methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+	})
+);
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, "public")));
+// Serve static files
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(join(__dirname, "public")));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
