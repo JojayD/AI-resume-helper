@@ -5,10 +5,10 @@ import axios from "../../Backend/axiosConfig.mjs";
 function LoginInterface(props) {
 	const navigate = useNavigate();
 	const apiUrl =
-		process.env.NODE_ENV === "development"
-			? "http://localhost:3000" // Local API for development
-			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
-
+		import.meta.env.MODE === "development"
+			? "http://localhost:3000"
+			: import.meta.env.VITE_API_URL; // Production API URL from environment variables
+	console.log(process.env);
 	console.log("Final API URL:", apiUrl);
 
 	async function handleSubmit(event) {

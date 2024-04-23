@@ -132,7 +132,7 @@ app.post("/register", async (req, res) => {
 				success: true,
 				user,
 				collection_name: "First conversation",
-				token
+				token,
 			});
 		}
 	} catch (error) {

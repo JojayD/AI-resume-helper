@@ -9,9 +9,9 @@ import { useCookies } from "react-cookie";
 import { useDocument } from "./Context";
 import axios from "../../Backend/axiosConfig.mjs";
 const apiUrl =
-	process.env.NODE_ENV === "development"
-		? "http://localhost:3000" // Local API for development
-		: process.env.REACT_APP_API_URL; // Production API URL from environment variables
+	import.meta.env.MODE === "development"
+		? "http://localhost:3000"
+		: import.meta.env.VITE_API_URL; // Production API URL from environment variables
 function ChatBotInput(props) {
 	console.log("APIURL", apiUrl);
 	const [fetchCounter, setFetchCounter] = useState(0);

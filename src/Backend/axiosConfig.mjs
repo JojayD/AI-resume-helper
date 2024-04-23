@@ -1,9 +1,9 @@
 // src/axiosConfig.js
 import axios from "axios";
-const apiUrl =
-	process.env.NODE_ENV === "development"
-		? "http://localhost:3000"
-		: process.env.REACT_APP_API_URL; // Production API URL from environment variables
+const apiUrl = import.meta.env.MODE === 'development'
+  ? 'http://localhost:3000'
+  : import.meta.env.VITE_API_URL; // Production API URL from environment variables
+
 
 axios.defaults.baseURL = apiUrl;
 axios.interceptors.request.use(

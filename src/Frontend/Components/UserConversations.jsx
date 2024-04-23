@@ -7,9 +7,9 @@ import "../Styles/UserConversations.css";
 import { useDocument } from "./Context";
 function UserConversations(props) {
 	const apiUrl =
-		process.env.NODE_ENV === "development"
-			? "http://localhost:3000" // Local API for development
-			: process.env.REACT_APP_API_URL; // Production API URL from environment variables
+		import.meta.env.MODE === "development"
+			? "http://localhost:3000"
+			: import.meta.env.VITE_API_URL; // Production API URL from environment variables
 
 	const [userConversations, setUserConversations] = useState([]);
 	const [collection, setCollection] = useState("");

@@ -5,9 +5,9 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-const apiUrl = process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : process.env.REACT_APP_API_URL; // Make sure this is correctly prefixed
+const apiUrl = import.meta.env.MODE === 'development'
+  ? 'http://localhost:3000'
+  : import.meta.env.VITE_API_URL; // Production API URL from environment variables
 function MakeUserInterface(props) {
 	const navigate = useNavigate();
 	useEffect(() => {
