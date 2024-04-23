@@ -23,7 +23,7 @@ dotenv.config({ path: "../../.env" });
 
 let url =
 	process.env.NODE_ENV === "development"
-		? "https://ai-resume-helper-m7ve01g4k-jojayds-projects.vercel.app"
+		? "ai-resume-helper-git-main-jojayds-projects.vercel.app"
 		: "http://localhost:5173";
 console.log("Currently in ", url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -34,6 +34,7 @@ const PORT2 = 3002;
 const corsOptions = {
 	origin: url,
 	credentials: true,
+	optionsSuccessStatus: 200, // For legacy browser support
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 };
 app.use(cors(corsOptions));
