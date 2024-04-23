@@ -8,7 +8,7 @@ function LoginInterface(props) {
 		import.meta.env.MODE === "development"
 			? "http://localhost:3000"
 			: import.meta.env.VITE_API_URL; // Production API URL from environment variables
-	console.log(process.env);
+	
 	console.log("Final API URL:", apiUrl);
 
 	async function handleSubmit(event) {

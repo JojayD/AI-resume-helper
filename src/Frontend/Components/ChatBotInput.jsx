@@ -25,6 +25,11 @@ function ChatBotInput(props) {
 	const [isLoadingBot, setIsLoadingBot] = useState(false);
 	const { document, setDocument } = useDocument();
 	const navigate = useNavigate();
+	const wsUrl =
+		process.env.NODE_ENV === "development"
+			? "ws://localhost:3000" // WebSocket URL for local development
+			: "wss:https://ai-resume-helper-a85984fdef49.herokuapp.com/";  // Secure WebSocket URL for production
+
 	useEffect(() => {
 		if (props.userId) {
 			console.log(
@@ -39,13 +44,13 @@ function ChatBotInput(props) {
 	}, []);
 
 	useEffect(() => {
-		const ws = new WebSocket("ws://localhost:3002");
+		const ws = new WebSocket(wsUrl);
 		ws.onmessage = (event) => {
 			const message = JSON.parse(event);
 			console.log(`New Data recieved from ai\nFrom websocket\nr${message}`);
 			getDataBase(props.userId, document);
 		};
-		return () => ws.close();
+		
 	}, []);
 
 	const mapConversation = () => {
