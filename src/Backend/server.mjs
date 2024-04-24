@@ -36,7 +36,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;
 const corsOptions = {
-	origin: developmentUrl,
+	origin: productionUrl,
 	credentials: true,
 	optionsSuccessStatus: 200, // For legacy browser support
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
