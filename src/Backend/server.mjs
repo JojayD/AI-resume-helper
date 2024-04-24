@@ -25,7 +25,7 @@ const developmentUrl = "http://localhost:5173";
 const productionUrl =
 	"https://ai-resume-helper-git-deploy-branch-jojayds-projects.vercel.app";
 const url =
-	process.env.NODE_ENV === "development" ? productionUrl : productionUrl;
+	process.env.NODE_ENV === "development" ? developmentUrl : productionUrl;
 
 console.log("Currently in ", url);
 
