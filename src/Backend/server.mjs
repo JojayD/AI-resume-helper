@@ -1,5 +1,5 @@
-//TODO I am currently redesigning the delete function all the function needs to now be
-//have a database since its based on the users
+//BUG collections not being registerd correctly
+//Fix might be to return an empty array and not include the user because it inclues the collection user
 //dbuser dbmaster1234
 //jo23 1234
 import { fileURLToPath } from "url";
@@ -23,7 +23,7 @@ dotenv.config({ path: "../../.env" });
 
 const developmentUrl = "http://localhost:5173";
 const productionUrl =
-	"https://ai-resume-helper-git-main-jojayds-projects.vercel.app";
+	"https://ai-resume-helper-git-deploy-branch-jojayds-projects.vercel.app";
 const url =
 	process.env.NODE_ENV === "development" ? productionUrl : productionUrl;
 
@@ -36,8 +36,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;
 const corsOptions = {
-	origin:
-		"https://ai-resume-helper-git-deploy-branch-jojayds-projects.vercel.app",
+	origin: developmentUrl,
 	credentials: true,
 	optionsSuccessStatus: 200, // For legacy browser support
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -250,13 +249,15 @@ app.delete("/delete_collection", async (req, res) => {
 		const { deletedCollectionName, databaseName } = req.query;
 
 		// const response = req.query.deletedCollectionName;
-		console.log("Delete response: ", deletedCollectionName);
+		console.log("Delete response:", deletedCollectionName);
 		const database = client.db(databaseName);
-		const collections = database.collection(deletedCollectionName);
-		const drop_status = await collections.drop();
-		if (drop_status) {
+		const collections = await database.collection(deletedCollectionName).drop();
+		console.log(collections);
+		if (collections) {
+			console.log();
 			const collection = fetchAllConversations(databaseName);
 			collection.then((response) => {
+				console.log("Logging response: ", response);
 				res.json(response);
 			});
 		}
@@ -285,7 +286,7 @@ async function main(input) {
 		});
 
 		console.log(
-			`Response from GPT-4: ${completion.choices[0].message.content}\n`
+			`Response from GPT-3.5: ${completion.choices[0].message.content}\n`
 		);
 		return completion.choices[0].message.content;
 	} catch (error) {
@@ -363,14 +364,13 @@ app.get("/get_conversations", (req, res) => {
 	const data = req.query.database;
 	console.log("Get conversation data: ", data);
 	console.log("getconvo called");
-
 	try {
 		const response = fetchAllConversations(data);
+		console.log("Response from get_conversation", response);
 		response.then((response) => {
 			res.json(response);
 		});
 	} catch (Error) {
-		console.log();
 		Error;
 	}
 });
@@ -383,9 +383,17 @@ async function fetchAllConversations(database) {
 
 	// Use listCollections to get an array of collection information
 	const collections = await dataBase.listCollections().toArray();
-	const collectionNames = collections.map((coll) => {
-		return coll.name;
-	}); // Extract the names of the collections
+	let collectionNames = collections.map((coll) => {
+		if (coll.name != "users") {
+			return coll.name;
+		}
+	});
+
+	if (collectionNames.length <= 0) {
+		collectionNames = [];
+	}
+
+	// Extract the names of the collections
 	console.log(collectionNames); // Log the actual names of the collections
 	return collectionNames;
 }

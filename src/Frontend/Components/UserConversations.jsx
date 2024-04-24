@@ -29,13 +29,12 @@ function UserConversations(props) {
 			.delete(
 				`${apiUrl}/delete_collection?deletedCollectionName=${encodeURIComponent(
 					val
-				)}&
-		)}&databaseName=${props.userId}`
+				)}&databaseName=${encodeURIComponent(props.userId)}`
 			)
 			.then((response) => {
 				console.log("Collection successfully deleted");
 				setUserConversations(response.data);
-				window.location.reload(); // Refresh the page
+				// window.location.reload(); // Refresh the page
 			});
 	}
 
@@ -51,11 +50,18 @@ function UserConversations(props) {
 	useEffect(() => {
 		axios(`${apiUrl}/get_conversations?database=${props.userId}`)
 			.then((result) => {
-				console.log(result.data);
+				console.log("Result line 53 UserConversation: ", result.data);
 				setUserConversations(result.data);
 				if (result.data.length > 0) {
-					console.log(`Setting document ${result.data[0]}`);
-					setDocument(result.data[0]);
+					if (result.data[0] == undefined || result.data[0] == null) {
+						console.log("Has Null", result.data);
+						result.data = [];
+						console.log("New Data has been set", result.data);
+						return;
+					} else {
+						console.log(`Setting document ${result.data[0]}`);
+						setDocument(result.data[0]);
+					}
 				}
 			})
 			.catch((error) => console.log(error));

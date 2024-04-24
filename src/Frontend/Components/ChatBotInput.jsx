@@ -118,12 +118,10 @@ function ChatBotInput(props) {
 		setInput("");
 	}
 
-	//TODO make sure the database gets called as a
+	
 	async function getDataBase(databaseName, collectionName) {
 		console.log("Called getDataBase", databaseName);
-		const url = `${apiUrl}/get_db?databaseName=${encodeURIComponent(
-			databaseName
-		)}&collectionName=${encodeURIComponent(collectionName)}`;
+		const url = `${apiUrl}/get_db?databaseName=${encodeURIComponent(databaseName)}&collectionName=${encodeURIComponent(collectionName)}`;
 
 		try {
 			const response = await axios.get(url);

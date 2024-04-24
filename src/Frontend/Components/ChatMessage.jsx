@@ -28,7 +28,6 @@ function ChatMessage({
 	function systemMessageAnimation() {
 		return (
 			<>
-			//TODO change this icon
 				<FontAwesomeIcon icon={faRobot} />
 				<div className='bg-iphone-receive text-left max-w-sm mx-auto rounded p-6 justify-start'>
 					<TypeAnimation
