@@ -44,7 +44,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-
+app.options
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 

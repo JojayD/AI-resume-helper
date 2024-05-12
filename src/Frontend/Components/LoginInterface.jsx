@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "../../Backend/axiosConfig.mjs";
 
 function LoginInterface(props) {
+
 	const navigate = useNavigate();
 	const apiUrl =
 		import.meta.env.MODE === "development"
@@ -10,6 +11,8 @@ function LoginInterface(props) {
 			: import.meta.env.VITE_API_URL; // Production API URL from environment variables
 	
 	console.log("Final API URL:", apiUrl);
+
+	// useEffect(() => {}, [props.setAuthenticated])
 
 	async function handleSubmit(event) {
 		event.preventDefault();
@@ -37,7 +40,7 @@ function LoginInterface(props) {
 		<div className='min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
 			<div className='max-w-md w-full space-y-8'>
 				<div>
-					<h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
+					<h2 className='mt-6 text-center text-3xl font-extrabold text-white'>
 						Sign in to your account
 					</h2>
 				</div>

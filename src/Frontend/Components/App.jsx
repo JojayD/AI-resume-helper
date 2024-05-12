@@ -6,8 +6,9 @@ import ChatBotInterface from "./ChatBotInterface";
 import { Routes, Route } from "react-router-dom";
 import LoginInterface from "./LoginInterface";
 import MakeUserInterface from "./MakeUserInterface";
-import '../../Backend/axiosConfig.mjs';  
-
+import "../../Backend/axiosConfig.mjs";
+import LandingPage from "./LandingPage";
+import TipOnePage from "./TipOnePage";
 
 function App() {
 	const [authenticated, setAuthenticated] = useState(false);
@@ -19,10 +20,24 @@ function App() {
 	}, [userId]);
 	return (
 		<>
-			<div className='flex gap-3 justify-center'>
+			<div
+				className={
+					authenticated
+						? "bg-white flex gap-3 justify-center"
+						: "flex gap-3 justify-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
+				}
+			>
 				<Routes>
 					<Route
 						path='/'
+						element={<LandingPage />}
+					/>
+					<Route
+						path="/TipOne"
+						element={<TipOnePage/>}
+					/>
+					<Route
+						path='/Login'
 						element={
 							<LoginInterface
 								authenticated={authenticated}
