@@ -16,6 +16,15 @@ function App() {
 	const [password, setPassword] = useState("");
 	const [userId, setUserId] = useState("");
 	useEffect(() => {
+		if (authenticated) {
+			document.body.classList.add("bg-white");
+			document.body.style.backgroundImage = "none";
+		} else {
+			document.body.classList.remove("bg-white");
+			document.body.style.backgroundImage = "";
+		}
+	}, [authenticated]);
+	useEffect(() => {
 		console.log("App.jsx", userId);
 	}, [userId]);
 	return (
@@ -23,7 +32,7 @@ function App() {
 			<div
 				className={
 					authenticated
-						? "bg-white flex gap-3 justify-center"
+						? "bg-white flex justify-center gap-3"
 						: "flex gap-3 justify-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
 				}
 			>
@@ -33,8 +42,8 @@ function App() {
 						element={<LandingPage />}
 					/>
 					<Route
-						path="/TipOne"
-						element={<TipOnePage/>}
+						path='/TipOne'
+						element={<TipOnePage />}
 					/>
 					<Route
 						path='/Login'

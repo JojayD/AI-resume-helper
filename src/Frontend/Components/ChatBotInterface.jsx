@@ -1,5 +1,6 @@
 import React from "react";
 import UserConversations from "./UserConversations";
+import { useEffect } from "react";
 import ChatBotInput from "./ChatBotInput";
 function ChatBotInterface({
 	username,
@@ -9,8 +10,15 @@ function ChatBotInterface({
 	userId,
 	setUserId,
 	authenticated,
-	setAuthenticated
+	setAuthenticated,
 }) {
+  useEffect(() => {
+			if (authenticated) {
+				document.body.classList.add("authenticated");
+			} else {
+				document.body.classList.remove("authenticated");
+			}
+		}, [authenticated]);
 	return (
 		<>
 			<UserConversations

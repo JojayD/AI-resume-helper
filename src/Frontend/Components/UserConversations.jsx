@@ -96,7 +96,7 @@ function UserConversations(props) {
 	};
 
 	return (
-		<div className='h-screen flex flex-col content-center items-center bg-iphone-recieve rounded p-4 shadow-lg'>
+		<div className='h-screen flex flex-col content-center items-center bg-iphone-recieve  p-4 shadow-lg  bg-gradient-to-r from-white via-gray-200 to-gray-500"'>
 			<button
 				className='border-black border-2 rounded pr-1 pl-1 w-8 mb-2'
 				onClick={() => createCollectionHandler(collection, props.userId)}

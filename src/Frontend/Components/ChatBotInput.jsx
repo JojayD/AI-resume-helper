@@ -152,7 +152,7 @@ function ChatBotInput(props) {
 		navigate("/");
 	}
 	return (
-		<div className='container'>
+		<div className='container bg-gradient-to-r from-white via-gray-200 to-gray-500'>
 			{props.authenticated ? (
 				<>
 					<div className='flex justify-end'>
